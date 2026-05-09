@@ -5,10 +5,10 @@ import java.sql.DriverManager;
 
 public class Conexion {
 
-    private static final String URL  = "jdbc:mysql://localhost:3306/datosusuario";
+    private static final String URL  = "jdbc:mysql://127.0.0.1:3306/datosusuario";
     private static final String USER = "root";
-    // IMPORTANTE: cambia esta contraseña por la que configuraste al instalar MySQL
-    private static final String PASS = "admin";
+    // XAMPP: contraseña vacía por defecto. Cámbiala si configuraste una distinta.
+    private static final String PASS = "";
 
     public Connection crearConexion() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");

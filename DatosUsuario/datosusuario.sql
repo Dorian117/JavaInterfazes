@@ -1,24 +1,22 @@
 -- ============================================================
--- Script SQL para el proyecto DatosUsuario
+-- Script SQL completo para el proyecto DatosUsuario
 -- Base de datos: datosusuario
--- Motor: MySQL 8+
+-- Motor: MySQL 8+ / MariaDB (XAMPP)
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS datosusuario;
 USE datosusuario;
 
 -- ------------------------------------------------------------
--- Tabla: perfiles
+-- Tablas
 -- ------------------------------------------------------------
-CREATE TABLE perfiles (
+
+CREATE TABLE IF NOT EXISTS perfiles (
   id_perfil INT PRIMARY KEY AUTO_INCREMENT,
   perfil    VARCHAR(30)
 );
 
--- ------------------------------------------------------------
--- Tabla: usuarios
--- ------------------------------------------------------------
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
   idusu     INT PRIMARY KEY AUTO_INCREMENT,
   num_docu  VARCHAR(20),
   nombre    VARCHAR(30),
@@ -30,19 +28,13 @@ CREATE TABLE usuarios (
   FOREIGN KEY (id_perfil) REFERENCES perfiles(id_perfil)
 );
 
--- ------------------------------------------------------------
--- Tabla: actividades
--- ------------------------------------------------------------
-CREATE TABLE actividades (
+CREATE TABLE IF NOT EXISTS actividades (
   id_actividad  INT PRIMARY KEY AUTO_INCREMENT,
   nom_actividad VARCHAR(45),
   enlace        VARCHAR(100)
 );
 
--- ------------------------------------------------------------
--- Tabla: gesactividad
--- ------------------------------------------------------------
-CREATE TABLE gesactividad (
+CREATE TABLE IF NOT EXISTS gesactividad (
   idgesActividad INT PRIMARY KEY AUTO_INCREMENT,
   id_perfil      INT,
   id_actividad   INT,
@@ -50,9 +42,9 @@ CREATE TABLE gesactividad (
   FOREIGN KEY (id_actividad) REFERENCES actividades(id_actividad)
 );
 
--- ============================================================
--- Datos de prueba
--- ============================================================
+-- ------------------------------------------------------------
+-- Datos de prueba iniciales
+-- ------------------------------------------------------------
 
 INSERT INTO perfiles VALUES
   (1, 'Administrador'),
@@ -67,8 +59,15 @@ INSERT INTO actividades VALUES
   (2, 'Registro Usuario',         'regUsuario.jsp'),
   (3, 'Registro de Actividades',  'regActividad.jsp'),
   (4, 'Gestión Actividades',      'gestActividades.jsp'),
-  (5, 'Prueba20',                 'prueba20.jsp');
+  (5, 'Prueba20',                 'prueba20.jsp'),
+  (6, 'Gestión de Roles',         'gestionRoles.jsp'),
+  (7, 'Nueva Actividad',          'regActividad.jsp');
 
+-- Administrador: accede a todo
 INSERT INTO gesactividad VALUES
   (1, 1, 1), (2, 1, 2), (3, 1, 3), (4, 1, 4), (5, 1, 5),
+  (7, 1, 6), (8, 1, 7);
+
+-- Operador: solo lista de usuarios
+INSERT INTO gesactividad VALUES
   (6, 2, 1);
