@@ -137,4 +137,25 @@ public class UsuarioDAO {
             try { if (con  != null) con.close();  } catch (Exception ignored) {}
         }
     }
+
+    /** Retorna el idusu del usuario por nombre de usuario, o 0 si no existe. */
+    public int getIdUsuario(String nombreUsuario) {
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            con  = new Conexion().crearConexion();
+            stmt = con.prepareStatement("SELECT idusu FROM usuarios WHERE usuario = ?");
+            stmt.setString(1, nombreUsuario);
+            rs = stmt.executeQuery();
+            return rs.next() ? rs.getInt("idusu") : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            try { if (rs   != null) rs.close();   } catch (Exception ignored) {}
+            try { if (stmt != null) stmt.close();  } catch (Exception ignored) {}
+            try { if (con  != null) con.close();   } catch (Exception ignored) {}
+        }
+    }
 }

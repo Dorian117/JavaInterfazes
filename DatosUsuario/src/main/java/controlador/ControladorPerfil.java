@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AuditoriaUtil;
 import modelo.PerfilDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,8 +28,9 @@ public class ControladorPerfil extends HttpServlet {
     private void procesar(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        String accion = request.getParameter("accion");
-        PerfilDAO dao = new PerfilDAO();
+        String accion   = request.getParameter("accion");
+        String nUsuario = (String) request.getSession(false).getAttribute("nUsuario");
+        PerfilDAO dao   = new PerfilDAO();
 
         if (accion == null) {
             response.sendRedirect("gestionRoles.jsp");
@@ -38,32 +40,39 @@ public class ControladorPerfil extends HttpServlet {
         switch (accion) {
 
             case "crear": {
-                String nombrePerfil = request.getParameter("nombrePerfil");
-                int[] idsActividades = parsearActividades(request);
+                String nombrePerfil  = request.getParameter("nombrePerfil");
+                int[]  idsActividades = parsearActividades(request);
 
                 int idPerfil = dao.insertarPerfil(nombrePerfil);
                 if (idPerfil > 0) {
                     dao.asignarActividades(idPerfil, idsActividades);
                 }
+                AuditoriaUtil.registrar(request, nUsuario,
+                    "CREAR", "ROL", "Rol creado: " + nombrePerfil);
                 response.sendRedirect("gestionRoles.jsp");
                 break;
             }
 
             case "editar": {
-                int idPerfil = Integer.parseInt(request.getParameter("idPerfil"));
-                int[] idsActividades = parsearActividades(request);
+                String idPerfilStr   = request.getParameter("idPerfil");
+                int    idPerfil      = Integer.parseInt(idPerfilStr);
+                int[]  idsActividades = parsearActividades(request);
                 dao.asignarActividades(idPerfil, idsActividades);
+                AuditoriaUtil.registrar(request, nUsuario,
+                    "EDITAR", "ROL", "Permisos editados del rol ID: " + idPerfilStr);
                 response.sendRedirect("gestionRoles.jsp");
                 break;
             }
 
             case "eliminar": {
-                int idPerfil = Integer.parseInt(request.getParameter("idPerfil"));
-                boolean eliminado = dao.eliminarPerfil(idPerfil);
+                String idPerfilStr = request.getParameter("idPerfil");
+                int    idPerfil    = Integer.parseInt(idPerfilStr);
+                boolean eliminado  = dao.eliminarPerfil(idPerfil);
                 if (eliminado) {
+                    AuditoriaUtil.registrar(request, nUsuario,
+                        "ELIMINAR", "ROL", "Rol eliminado: ID " + idPerfilStr);
                     response.sendRedirect("gestionRoles.jsp");
                 } else {
-                    // Perfil tiene usuarios asignados; volver con aviso
                     response.sendRedirect("gestionRoles.jsp?error=tieneUsuarios&idPerfil=" + idPerfil);
                 }
                 break;
@@ -74,16 +83,11 @@ public class ControladorPerfil extends HttpServlet {
         }
     }
 
-    /** Convierte los valores del checkbox "actividades[]" en int[]. */
     private int[] parsearActividades(HttpServletRequest request) {
         String[] valores = request.getParameterValues("actividades[]");
-        if (valores == null || valores.length == 0) {
-            return new int[0];
-        }
+        if (valores == null || valores.length == 0) return new int[0];
         int[] ids = new int[valores.length];
-        for (int i = 0; i < valores.length; i++) {
-            ids[i] = Integer.parseInt(valores[i]);
-        }
+        for (int i = 0; i < valores.length; i++) ids[i] = Integer.parseInt(valores[i]);
         return ids;
     }
 }

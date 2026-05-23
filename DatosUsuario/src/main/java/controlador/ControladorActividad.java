@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AuditoriaUtil;
 import modelo.Conexion;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,7 +31,9 @@ public class ControladorActividad extends HttpServlet {
     private void procesar(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        String accion = request.getParameter("accion");
+        String accion   = request.getParameter("accion");
+        String nUsuario = (String) request.getSession(false).getAttribute("nUsuario");
+
         if (accion == null) {
             response.sendRedirect("gestActividades.jsp");
             return;
@@ -42,26 +45,34 @@ public class ControladorActividad extends HttpServlet {
                 String nomActividad = request.getParameter("nom_actividad");
                 String enlace       = request.getParameter("enlace");
                 insertar(nomActividad, enlace);
+                AuditoriaUtil.registrar(request, nUsuario,
+                    "CREAR", "ACTIVIDAD", "Actividad creada: " + nomActividad);
                 response.sendRedirect("gestActividades.jsp");
                 break;
             }
 
             case "eliminar": {
-                int id = Integer.parseInt(request.getParameter("id"));
+                String idStr = request.getParameter("id");
+                int id = Integer.parseInt(idStr);
                 if (tieneAsignaciones(id)) {
                     response.sendRedirect("gestActividades.jsp?error=asignada&id=" + id);
                 } else {
                     eliminar(id);
+                    AuditoriaUtil.registrar(request, nUsuario,
+                        "ELIMINAR", "ACTIVIDAD", "Actividad eliminada: ID " + idStr);
                     response.sendRedirect("gestActividades.jsp");
                 }
                 break;
             }
 
             case "actualizar": {
-                int    id           = Integer.parseInt(request.getParameter("id"));
+                String idStr        = request.getParameter("id");
+                int    id           = Integer.parseInt(idStr);
                 String nomActividad = request.getParameter("nom_actividad");
                 String enlace       = request.getParameter("enlace");
                 actualizar(id, nomActividad, enlace);
+                AuditoriaUtil.registrar(request, nUsuario,
+                    "EDITAR", "ACTIVIDAD", "Actividad editada: ID " + idStr);
                 response.sendRedirect("gestActividades.jsp");
                 break;
             }
@@ -84,9 +95,7 @@ public class ControladorActividad extends HttpServlet {
             stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            cerrar(stmt, con);
-        }
+        } finally { cerrar(stmt, con); }
     }
 
     private void actualizar(int id, String nomActividad, String enlace) {
@@ -103,9 +112,7 @@ public class ControladorActividad extends HttpServlet {
             stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            cerrar(stmt, con);
-        }
+        } finally { cerrar(stmt, con); }
     }
 
     private void eliminar(int id) {
@@ -118,12 +125,9 @@ public class ControladorActividad extends HttpServlet {
             stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            cerrar(stmt, con);
-        }
+        } finally { cerrar(stmt, con); }
     }
 
-    /** Verifica si la actividad está asignada a algún perfil en gesactividad. */
     private boolean tieneAsignaciones(int id) {
         Connection con = null;
         PreparedStatement stmt = null;
@@ -138,9 +142,9 @@ public class ControladorActividad extends HttpServlet {
             return rs.next() && rs.getInt(1) > 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return true; // por seguridad, bloquear si hay error
+            return true;
         } finally {
-            try { if (rs   != null) rs.close();   } catch (Exception ignored) {}
+            try { if (rs != null) rs.close(); } catch (Exception ignored) {}
             cerrar(stmt, con);
         }
     }

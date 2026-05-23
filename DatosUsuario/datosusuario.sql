@@ -43,6 +43,23 @@ CREATE TABLE IF NOT EXISTS gesactividad (
 );
 
 -- ------------------------------------------------------------
+-- Tabla de auditoría (nueva)
+-- ------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS auditoria (
+  id_auditoria    INT PRIMARY KEY AUTO_INCREMENT,
+  idusu           INT NOT NULL,
+  usuario         VARCHAR(20) NOT NULL,
+  nombre_completo VARCHAR(61),
+  accion          VARCHAR(50) NOT NULL,
+  modulo          VARCHAR(30) NOT NULL,
+  descripcion     VARCHAR(255),
+  ip_address      VARCHAR(45),
+  fecha           DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (idusu) REFERENCES usuarios(idusu) ON DELETE CASCADE
+);
+
+-- ------------------------------------------------------------
 -- Datos de prueba iniciales
 -- ------------------------------------------------------------
 
@@ -61,12 +78,13 @@ INSERT INTO actividades VALUES
   (4, 'Gestión Actividades',      'gestActividades.jsp'),
   (5, 'Prueba20',                 'prueba20.jsp'),
   (6, 'Gestión de Roles',         'gestionRoles.jsp'),
-  (7, 'Nueva Actividad',          'regActividad.jsp');
+  (7, 'Nueva Actividad',          'regActividad.jsp'),
+  (8, 'Auditoría',                'auditoria.jsp');
 
--- Administrador: accede a todo
+-- Administrador: accede a todo (incluyendo Auditoría)
 INSERT INTO gesactividad VALUES
   (1, 1, 1), (2, 1, 2), (3, 1, 3), (4, 1, 4), (5, 1, 5),
-  (7, 1, 6), (8, 1, 7);
+  (7, 1, 6), (8, 1, 7), (9, 1, 8);
 
 -- Operador: solo lista de usuarios
 INSERT INTO gesactividad VALUES

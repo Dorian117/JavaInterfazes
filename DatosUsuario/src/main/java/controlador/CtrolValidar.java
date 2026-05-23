@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AuditoriaUtil;
 import modelo.LoginDAO;
 import modelo.Usuario;
 import jakarta.servlet.RequestDispatcher;
@@ -29,9 +30,13 @@ public class CtrolValidar extends HttpServlet {
             if (datos != null && datos.getUsuario() != null) {
                 HttpSession sesion_cli = request.getSession(true);
                 sesion_cli.setAttribute("nUsuario", cusuario);
+                AuditoriaUtil.registrar(request, cusuario,
+                    "LOGIN", "SISTEMA", "Inicio de sesión exitoso");
                 RequestDispatcher rd = request.getRequestDispatcher("cpanel.jsp");
                 rd.forward(request, response);
             } else {
+                AuditoriaUtil.registrar(request, cusuario,
+                    "LOGIN", "SISTEMA", "Intento de login fallido");
                 RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
                 rd.forward(request, response);
             }

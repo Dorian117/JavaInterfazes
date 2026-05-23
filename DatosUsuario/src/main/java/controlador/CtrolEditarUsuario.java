@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AuditoriaUtil;
 import modelo.Usuario;
 import modelo.UsuarioDAO;
 import jakarta.servlet.ServletException;
@@ -17,9 +18,11 @@ public class CtrolEditarUsuario extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String nUsuario = (String) request.getSession(false).getAttribute("nUsuario");
 
+        String idStr = request.getParameter("idusu");
         Usuario u = new Usuario();
-        u.setIdusu(Integer.parseInt(request.getParameter("idusu")));
+        u.setIdusu(Integer.parseInt(idStr));
         u.setNum_docu(request.getParameter("num_docu"));
         u.setNombre(request.getParameter("nombre"));
         u.setApellido(request.getParameter("apellido"));
@@ -29,6 +32,9 @@ public class CtrolEditarUsuario extends HttpServlet {
         u.setId_perfil(Integer.parseInt(request.getParameter("id_perfil")));
 
         new UsuarioDAO().actualizar(u);
+
+        AuditoriaUtil.registrar(request, nUsuario,
+            "EDITAR", "USUARIO", "Usuario editado: ID " + idStr);
 
         response.sendRedirect("listarUsuarios.jsp");
     }

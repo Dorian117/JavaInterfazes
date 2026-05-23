@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AuditoriaUtil;
 import modelo.Usuario;
 import modelo.UsuarioDAO;
 import jakarta.servlet.ServletException;
@@ -17,17 +18,22 @@ public class ControladorUsuario extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String nUsuario = (String) request.getSession(false).getAttribute("nUsuario");
 
         Usuario u = new Usuario();
         u.setNum_docu(request.getParameter("num_docu"));
         u.setNombre(request.getParameter("nombre"));
         u.setApellido(request.getParameter("apellido"));
         u.setEmail(request.getParameter("email"));
-        u.setUsuario(request.getParameter("usuario"));
+        String usuario = request.getParameter("usuario");
+        u.setUsuario(usuario);
         u.setClave(request.getParameter("clave"));
         u.setId_perfil(Integer.parseInt(request.getParameter("id_perfil")));
 
         new UsuarioDAO().insertar(u);
+
+        AuditoriaUtil.registrar(request, nUsuario,
+            "CREAR", "USUARIO", "Usuario creado: " + usuario);
 
         response.sendRedirect("listarUsuarios.jsp");
     }
